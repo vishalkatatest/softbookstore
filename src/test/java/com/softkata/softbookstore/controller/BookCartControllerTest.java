@@ -2,6 +2,7 @@ package com.softkata.softbookstore.controller;
 
 
 import com.softkata.softbookstore.BookTestDataProvider;
+import com.softkata.softbookstore.domain.Book;
 import com.softkata.softbookstore.domain.Cart;
 import com.softkata.softbookstore.domain.CartBook;
 import com.softkata.softbookstore.domain.CartResponse;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
 public class BookCartControllerTest {
@@ -45,6 +47,13 @@ public class BookCartControllerTest {
         assertEquals(200, response.getStatusCode().value());
         assert response.getBody() != null;
         assertEquals(320.0, response.getBody().getCartAmount());
+    }
+
+    @Test
+    public void getAllBooksMasterdata() {
+        ResponseEntity<List<Book>> booksResponse = this.bookCartController.getBookMasterData();
+        assertEquals(200, booksResponse.getStatusCode().value());
+        assertNotNull(booksResponse.getBody());
     }
 
 }
