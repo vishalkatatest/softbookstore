@@ -59,16 +59,20 @@ public class DiscountCalculatorService {
         //If only one distinct book present in the list then it will straight go to return statement with 0 discount
         for (int distBookProb = distinctBookCnt; distBookProb >1; distBookProb--) {
             int totBookCartCnt = totalBooksInCart;
-            Map<Integer, Integer> bookCopiesMap = new HashMap<>(bookMainCopiesMap);
+            Map<Integer, Integer> bookCopiesMap = HashMap.newHashMap(bookMainCopiesMap.size());
+            bookCopiesMap.putAll(bookMainCopiesMap);
             List<Set<Integer>> bookDiscList = new ArrayList<>();
             while (totBookCartCnt >0) {
-                Set<Integer> bookSet = new HashSet<>();
-                for (CartBook book: cartBooks) {
-                    if (bookCopiesMap.get(book.bookId()) >0) {
-                        bookSet.add(book.bookId());
-                        bookCopiesMap.put(book.bookId(), bookCopiesMap.get(book.bookId()) -1);
+                Set<Integer> bookSet = HashSet.newHashSet(distBookProb);
+                for (CartBook book : cartBooks) {
+                    int bookId = book.bookId();
+                    int currentCount = bookCopiesMap.getOrDefault(bookId, 0);
+                    if (currentCount > 0) {
+                        bookSet.add(bookId);
+                        bookCopiesMap.put(bookId, currentCount - 1);
                         totBookCartCnt--;
-                        if(bookSet.size() == distBookProb) {
+
+                        if (bookSet.size() == distBookProb) {
                             break;
                         }
                     }
