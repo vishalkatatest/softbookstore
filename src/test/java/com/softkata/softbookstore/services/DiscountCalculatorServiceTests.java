@@ -59,6 +59,20 @@ public class DiscountCalculatorServiceTests {
 
     }
 
+    @Test()
+    public void validateIfUnknownBoookIDPassedToProcessDiscount() {
+        CartBook cartBook1 = new CartBook(1006, "The Coder", 2,50);
+        List<CartBook> books = new ArrayList<>();
+        books.add(cartBook1);
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> this.discountCalculatorService.processDiscount(books),
+                "Should throw IllegalArgumentException for Unknown Book ID"
+        );
+        assertEquals("Validation Failed: Book ID " + cartBook1.bookId() + " does not exist in the master catalog.", exception.getMessage());
+
+    }
+
 
 
 }

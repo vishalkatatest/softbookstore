@@ -1,19 +1,22 @@
 package com.softkata.softbookstore.services;
 
+import com.softkata.softbookstore.domain.Book;
 import com.softkata.softbookstore.domain.CartBook;
 import com.softkata.softbookstore.domain.DiscountProperties;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Service
 public class DiscountCalculatorService {
 
     DiscountProperties discountProperties;
-
-    public DiscountCalculatorService(DiscountProperties discountProperties) {
+    BookStoreService bookStoreService;
+    public DiscountCalculatorService(DiscountProperties discountProperties, BookStoreService bookStoreService) {
         this.discountProperties = discountProperties;
+        this.bookStoreService = bookStoreService;
     }
 
     public int getDiscount(int totalBooks) {
@@ -28,14 +31,30 @@ public class DiscountCalculatorService {
 
     }
 
-    public void processDiscount(List<CartBook> books) {
+    public void processDiscount(List<CartBook> cartBooks) {
 
-        //Check if list of books are not empty
-        if(books == null || books.isEmpty()) {
-            throw new IllegalArgumentException("No books are selected to process the cart");
-        }
+        validateBeforeProcessingDiscount(cartBooks);
 
     }
 
+    private void validateBeforeProcessingDiscount(List<CartBook> cartBooks) {
+
+        //Check if list of books are not empty
+        if(cartBooks == null || cartBooks.isEmpty()) {
+            throw new IllegalArgumentException("No books are selected to process the cart");
+        }
+
+        //Retrieve all valid book IDs from master data
+        Set<Integer> validBookIds = this.bookStoreService.getBookMasterData().stream()
+                .map(Book::bookId)
+                .collect(Collectors.toSet());
+
+        // Check for any unknown IDs
+        for (CartBook cartbook : cartBooks) {
+            if (!validBookIds.contains(cartbook.bookId())) {
+                throw new IllegalArgumentException("Validation Failed: Book ID " + cartbook.bookId() + " does not exist in the master catalog.");
+            }
+        }
+    }
 
 }
