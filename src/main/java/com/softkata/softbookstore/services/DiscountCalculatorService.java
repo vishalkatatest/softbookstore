@@ -1,7 +1,11 @@
 package com.softkata.softbookstore.services;
 
+import com.softkata.softbookstore.domain.CartBook;
 import com.softkata.softbookstore.domain.DiscountProperties;
 import org.springframework.stereotype.Service;
+
+import java.util.*;
+
 
 @Service
 public class DiscountCalculatorService {
@@ -23,4 +27,15 @@ public class DiscountCalculatorService {
         };
 
     }
+
+    public void processDiscount(List<CartBook> books) {
+
+        //Check if list of books are not empty
+        if(books == null || books.isEmpty()) {
+            throw new IllegalArgumentException("No books are selected to process the cart");
+        }
+
+    }
+
+
 }

@@ -1,10 +1,15 @@
 package com.softkata.softbookstore.services;
 
+import com.softkata.softbookstore.domain.CartBook;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 public class DiscountCalculatorServiceTests {
@@ -41,5 +46,19 @@ public class DiscountCalculatorServiceTests {
         int discVal = this.discountCalculatorService.getDiscount(5);
         assertEquals(25,discVal);
     }
+
+    @Test()
+    public void validateIfNoBooksAreSelectedToProcessDiscount() {
+        List<CartBook> books = new ArrayList<>();
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> this.discountCalculatorService.processDiscount(books),
+                "Should throw IllegalArgumentException for empty book list"
+        );
+        assertEquals("No books are selected to process the cart", exception.getMessage());
+
+    }
+
+
 
 }
