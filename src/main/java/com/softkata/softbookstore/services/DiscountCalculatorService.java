@@ -42,10 +42,10 @@ public class DiscountCalculatorService {
 
     }
 
-    public double processDiscount(List<CartBook> cartBooks) {
+    public double processDiscount(List<CartBook> cartBookData) {
 
-        validateBeforeProcessingDiscount(cartBooks);
-
+        validateBeforeProcessingDiscount(cartBookData);
+        List<CartBook> cartBooks = consolidateCart(cartBookData);
         int totalBooksInCart = 0;
         int distinctBookCnt = cartBooks.size();
         double maxDiscount = 0;
@@ -111,6 +111,13 @@ public class DiscountCalculatorService {
                 throw new IllegalArgumentException("Validation Failed: Book ID " + cartbook.bookId() + " does not exist in the master catalog.");
             }
         }
+
+        // Check for any book copy with negative numbers
+        for (CartBook cartbook : cartBooks) {
+            if (cartbook.copies() <1) {
+                throw new IllegalArgumentException("Validation Failed: Number of copies cannot be less than 1 for book ID " + cartbook.bookId());
+            }
+        }
     }
 
     private Map<Integer, Integer> getCartBookMapCopy(List<CartBook> cartBooks) {
@@ -141,6 +148,21 @@ public class DiscountCalculatorService {
 
         return Math.max(calculatedTotalDiscount, maxDiscount);
 
+    }
+
+    private List<CartBook> consolidateCart(List<CartBook> cartBooks) {
+        return cartBooks.stream()
+                .collect(Collectors.toMap(
+                        CartBook::bookId,
+                        book -> book, // Keep the entire book object as the starting value
+                        (existing, replacement) -> new CartBook(
+                                existing.bookId(),
+                                existing.title(),
+                                existing.copies() + replacement.copies() // Sum the copies together
+                        )
+                ))
+                .values().stream()
+                .toList();
     }
 
 }

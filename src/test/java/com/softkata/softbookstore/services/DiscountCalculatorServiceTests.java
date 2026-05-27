@@ -82,6 +82,19 @@ public class DiscountCalculatorServiceTests {
 
     }
 
+
+    @Test()
+    public void validateIfBookCopiesPassedWithNegativeNumber() {
+        List<CartBook> books = List.of(bookTestDataProvider.addDummyCodeBook(-2));
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> this.discountCalculatorService.processDiscount(books),
+                "Should throw IllegalArgumentException for Negative copies"
+        );
+        assertEquals("Validation Failed: Number of copies cannot be less than 1 for book ID " + books.getFirst().bookId(), exception.getMessage());
+
+    }
+
     @Test
     public void checkForDiscountCalculationWhen1DistinctBookSelected() {
         List<CartBook> books = List.of(bookTestDataProvider.addDummyCodeBook(2));
@@ -163,6 +176,21 @@ public class DiscountCalculatorServiceTests {
         );
         double discountAmt = this.discountCalculatorService.processDiscount(books);
         assertEquals(125, discountAmt);
+    }
+
+    @Test
+    public void checkForMixedBagDiscountWithMultipleEntriesCalculation() {
+
+        List<CartBook> books = List.of(
+                bookTestDataProvider.addDummyCodeBook(1),
+                bookTestDataProvider.addDummyCodeBook(1),
+                bookTestDataProvider.addDummyCoderBook(2),
+                bookTestDataProvider.addDummyCleanArchitectureBook(2),
+                bookTestDataProvider.addDummyTDDByExampleBook(1),
+                bookTestDataProvider.addDummyWorkingWithLegacyBook(1)
+        );
+        double discountAmt = this.discountCalculatorService.processDiscount(books);
+        assertEquals(80, discountAmt);
     }
 
 
