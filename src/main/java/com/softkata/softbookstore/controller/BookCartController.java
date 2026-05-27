@@ -1,6 +1,7 @@
 package com.softkata.softbookstore.controller;
 
 import com.softkata.softbookstore.domain.Cart;
+import com.softkata.softbookstore.domain.CartResponse;
 import com.softkata.softbookstore.services.BookCartService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,13 +21,8 @@ public class BookCartController {
     }
 
     @PostMapping("/checkout")
-    public ResponseEntity<String> processCart(@RequestBody Cart bookCart) {
-        try {
-            double processedCartAmount = this.bookCartService.processCartAmount(bookCart);
-            return ResponseEntity.ok(String.valueOf(processedCartAmount));
-        } catch(IllegalArgumentException e) {
-            return ResponseEntity.internalServerError().body(e.getMessage());
-        }
+    public ResponseEntity<CartResponse> processCart(@RequestBody Cart bookCart) {
+            return ResponseEntity.ok(this.bookCartService.processCartAmount(bookCart));
     }
 
 }

@@ -4,6 +4,7 @@ package com.softkata.softbookstore.controller;
 import com.softkata.softbookstore.BookTestDataProvider;
 import com.softkata.softbookstore.domain.Cart;
 import com.softkata.softbookstore.domain.CartBook;
+import com.softkata.softbookstore.domain.CartResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,11 +39,12 @@ public class BookCartControllerTest {
                 bookTestDataProvider.addDummyWorkingWithLegacyBook(1));
         Cart bookCart = new Cart(books);
 
-        ResponseEntity<String> response =
+        ResponseEntity<CartResponse> response =
                 bookCartController.processCart(bookCart);
 
         assertEquals(200, response.getStatusCode().value());
-        assertEquals("320.0", response.getBody());
+        assert response.getBody() != null;
+        assertEquals(320.0, response.getBody().getCartAmount());
     }
 
 }
