@@ -9,9 +9,11 @@ import java.util.List;
 @Service
 public class BookCartService {
     DiscountCalculatorService discountCalculatorService;
+    BookStoreService bookStoreService;
 
-    public BookCartService(DiscountCalculatorService discountCalculatorService) {
+    public BookCartService(DiscountCalculatorService discountCalculatorService, BookStoreService bookStoreService) {
         this.discountCalculatorService = discountCalculatorService;
+        this.bookStoreService = bookStoreService;
     }
 
     public double processCartAmount(Cart bookCart) {
@@ -21,6 +23,9 @@ public class BookCartService {
     }
 
     private double totalAmount(List<CartBook> books) {
-        return books.stream().mapToDouble(book -> book.copies()* book.price()).sum();
+        return books.stream().mapToDouble(book -> {
+            double unitPrice = bookStoreService.getMasterBookPriceMapCopy().getOrDefault(book.bookId(), 0.0);
+            return book.copies() * unitPrice;
+        }).sum();
     }
 }

@@ -5,6 +5,8 @@ import com.softkata.softbookstore.domain.BookStoreProperties;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class BookStoreService {
@@ -16,5 +18,13 @@ public class BookStoreService {
 
     public List<Book> getBookMasterData() {
         return bookStoreProperties.books();
+    }
+
+    public Map<Integer, Double> getMasterBookPriceMapCopy() {
+        return bookStoreProperties.books().stream()
+                .collect(Collectors.toMap(
+                        Book::bookId,
+                        Book::price
+                ));
     }
 }

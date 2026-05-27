@@ -121,18 +121,11 @@ public class DiscountCalculatorService {
                 ));
     }
 
-    private Map<Integer, Double> getMasterBookMapCopy() {
-        return this.bookStoreService.getBookMasterData().stream()
-                .collect(Collectors.toMap(
-                        Book::bookId,
-                        Book::price
-                ));
-    }
 
     private double processMaxDiscount(List<Set<Integer>> bookDiscList, double maxDiscount) {
 
         //get Book Master data map for Price calculation
-        Map<Integer, Double> bookMasterDataMap = getMasterBookMapCopy();
+        Map<Integer, Double> bookMasterDataMap = bookStoreService.getMasterBookPriceMapCopy();
 
         //process set with standard discount rate
         double calculatedTotalDiscount = bookDiscList.stream()
