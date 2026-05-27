@@ -73,6 +73,48 @@ public class DiscountCalculatorServiceTests {
 
     }
 
+    @Test
+    public void checkForDiscountCalculationWhen1DistinctBookSelected() {
+        CartBook cartBook1 = new CartBook(1001, "Clean Code", 1,50);
+        List<CartBook> books = List.of(cartBook1);
+        double discountAmt = this.discountCalculatorService.processDiscount(books);
+        assertEquals(0, discountAmt);
+    }
+
+    @Test
+    public void checkForDiscountCalculationWhen2DistinctBookSelected() {
+        CartBook cartBook1 = new CartBook(1001, "Clean Code", 1,50);
+        CartBook cartBook2 = new CartBook(1002, "The Clean Coder", 1,50);
+        List<CartBook> books = List.of(cartBook1, cartBook2);
+
+        double discountAmt = this.discountCalculatorService.processDiscount(books);
+        assertEquals(5, discountAmt);
+    }
+
+    @Test
+    public void checkForDiscountCalculationWhen3DistinctBookSelected() {
+
+        CartBook cartBook1 = new CartBook(1001, "Clean Code", 1,50);
+        CartBook cartBook2 = new CartBook(1002, "The Clean Coder", 1,50);
+        CartBook cartBook3 = new CartBook(1003, "Clean Architecture", 1,50);
+        List<CartBook> books = List.of(cartBook1, cartBook2, cartBook3);
+
+        double discountAmt = this.discountCalculatorService.processDiscount(books);
+        assertEquals(15, discountAmt);
+    }
+
+    @Test
+    public void checkForDiscountCalculationWhen4DistinctBookSelected() {
+
+        CartBook cartBook1 = new CartBook(1001, "Clean Code", 1,50);
+        CartBook cartBook2 = new CartBook(1002, "The Clean Coder", 1,50);
+        CartBook cartBook3 = new CartBook(1003, "Clean Architecture", 1,50);
+        CartBook cartBook4 = new CartBook(1004, "Test Driven Development by Example", 1,50);
+        List<CartBook> books = List.of(cartBook1, cartBook2, cartBook3, cartBook4);
+
+        double discountAmt = this.discountCalculatorService.processDiscount(books);
+        assertEquals(40, discountAmt);
+    }
 
 
 }
