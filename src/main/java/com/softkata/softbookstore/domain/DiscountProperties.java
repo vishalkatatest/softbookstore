@@ -5,7 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConfigurationProperties(prefix = "books")
+@ConfigurationProperties(prefix = "book-discount")
 @Data
 public class DiscountProperties {
     private int discountFor2Books;
