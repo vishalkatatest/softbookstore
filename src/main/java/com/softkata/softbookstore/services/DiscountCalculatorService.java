@@ -2,7 +2,7 @@ package com.softkata.softbookstore.services;
 
 import com.softkata.softbookstore.domain.Book;
 import com.softkata.softbookstore.domain.CartBook;
-import com.softkata.softbookstore.domain.DiscountProperties;
+import com.softkata.softbookstore.domain.DiscountData;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -12,22 +12,27 @@ import java.util.stream.Collectors;
 @Service
 public class DiscountCalculatorService {
 
-    DiscountProperties discountProperties;
+    DiscountRulesService discountRulesService;
     BookStoreService bookStoreService;
-    public DiscountCalculatorService(DiscountProperties discountProperties, BookStoreService bookStoreService) {
-        this.discountProperties = discountProperties;
+
+    public DiscountCalculatorService(DiscountRulesService discountRulesService, BookStoreService bookStoreService) {
+        this.discountRulesService = discountRulesService;
         this.bookStoreService = bookStoreService;
     }
 
     public int getDiscount(int totalBooks) {
 
-        return  switch (totalBooks) {
-            case 2 -> discountProperties.getDiscountFor2Books();
-            case 3 -> discountProperties.getDiscountFor3Books();
-            case 4 -> discountProperties.getDiscountFor4Books();
-            case 5 -> discountProperties.getDiscountFor5Books();
-            default -> 0;
-        };
+        List<DiscountData> discountRules = discountRulesService.getDiscountRules();
+
+        if (discountRules == null || discountRules.isEmpty() || totalBooks <= 0) {
+            return 0;
+        }
+
+        return discountRules.stream()
+                .filter(rule -> totalBooks == rule.noOfBooks())
+                .mapToInt(DiscountData::discPercent)
+                .findFirst()
+                .orElse(0);
 
     }
 

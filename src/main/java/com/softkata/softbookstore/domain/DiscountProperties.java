@@ -1,15 +1,8 @@
 package com.softkata.softbookstore.domain;
 
-import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
+import java.util.List;
 
-@Component
 @ConfigurationProperties(prefix = "app.book-discount")
-@Data
-public class DiscountProperties {
-    private int discountFor2Books;
-    private int discountFor3Books;
-    private int discountFor4Books;
-    private int discountFor5Books;
+public record DiscountProperties(List<DiscountData> discountData) {
 }
