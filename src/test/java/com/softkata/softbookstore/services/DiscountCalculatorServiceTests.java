@@ -2,12 +2,15 @@ package com.softkata.softbookstore.services;
 
 import com.softkata.softbookstore.BookTestDataProvider;
 import com.softkata.softbookstore.domain.CartBook;
+import com.softkata.softbookstore.domain.DiscountData;
+import com.softkata.softbookstore.domain.DiscountProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -25,6 +28,12 @@ public class DiscountCalculatorServiceTests {
 
     @Autowired
     private DiscountCalculatorService discountCalculatorService;
+
+    @Autowired
+    private BookStoreService bookStoreService;
+
+    @Autowired
+    private DiscountProperties discountProperties;
 
     @Test
     public void checkDiscountPercentForSingleDistinctBooks() {
@@ -48,6 +57,45 @@ public class DiscountCalculatorServiceTests {
     public void checkDiscountPercentForFourDistinctBooks() {
         int discVal = this.discountCalculatorService.getDiscount(4);
         assertEquals(20,discVal);
+    }
+
+
+    @Test
+    public void checkDiscountPercentForZeroDistinctBooks() {
+        int discVal = this.discountCalculatorService.getDiscount(0);
+        assertEquals(0,discVal);
+    }
+
+    @Test
+    public void checkDiscountPercentWhenDiscountRulesMissing() {
+
+
+        DiscountRulesService nullRulesService = new DiscountRulesService(discountProperties) {
+            @Override
+            public List<DiscountData> getDiscountRules() {
+                return null;
+            }
+        };
+        DiscountCalculatorService currDiscountCalculatorService = new DiscountCalculatorService(nullRulesService, bookStoreService);
+
+        int discVal = currDiscountCalculatorService.getDiscount(0);
+        assertEquals(0,discVal);
+    }
+
+    @Test
+    public void checkDiscountPercentWhenDiscountRulesAreEmpty() {
+
+
+        DiscountRulesService emptyRulesService = new DiscountRulesService(discountProperties) {
+            @Override
+            public List<DiscountData> getDiscountRules() {
+                return Collections.emptyList();
+            }
+        };
+        DiscountCalculatorService currDiscountCalculatorService = new DiscountCalculatorService(emptyRulesService, bookStoreService);
+
+        int discVal = currDiscountCalculatorService.getDiscount(0);
+        assertEquals(0,discVal);
     }
 
     @Test
@@ -92,6 +140,18 @@ public class DiscountCalculatorServiceTests {
                 "Should throw IllegalArgumentException for Negative copies"
         );
         assertEquals("Validation Failed: Number of copies cannot be less than 1 for book ID " + books.getFirst().bookId(), exception.getMessage());
+
+    }
+
+    @Test()
+    public void validateIfBookCopiesPassedWithNullList() {
+        List<CartBook> books = null;
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> this.discountCalculatorService.processDiscount(books),
+                "Should throw IllegalArgumentException for empty book list"
+        );
+        assertEquals("No books are selected to process the cart", exception.getMessage());
 
     }
 

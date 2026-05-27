@@ -10,4 +10,9 @@ class SoftbookstoreApplicationTests {
     void contextLoads() {
     }
 
+    @Test
+    void main1() {
+        SoftbookstoreApplication.main(new String[] {});
+    }
+
 }
