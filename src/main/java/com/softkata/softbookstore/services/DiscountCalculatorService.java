@@ -14,6 +14,10 @@ import java.util.stream.Collectors;
 @Service
 public class DiscountCalculatorService {
 
+    private static final int DECIMAL_ROUND_OFF = 2;
+    private static final double TOTAL_PERCENT = 100.0;
+    private static final String EMPTY_CART_MESSAGE = "No books are selected to process the cart";
+
     DiscountRulesService discountRulesService;
     BookStoreService bookStoreService;
 
@@ -84,7 +88,7 @@ public class DiscountCalculatorService {
             maxDiscount = processMaxDiscount(bookDiscList, maxDiscount);
         }
         BigDecimal bd = new BigDecimal(Double.toString(maxDiscount));
-        bd = bd.setScale(2, RoundingMode.HALF_UP);
+        bd = bd.setScale(DECIMAL_ROUND_OFF, RoundingMode.HALF_UP);
         return bd.doubleValue();
 
     }
@@ -93,7 +97,7 @@ public class DiscountCalculatorService {
 
         //Check if list of books are not empty
         if(cartBooks == null || cartBooks.isEmpty()) {
-            throw new IllegalArgumentException("No books are selected to process the cart");
+            throw new IllegalArgumentException(EMPTY_CART_MESSAGE);
         }
 
         //Retrieve all valid book IDs from master data
@@ -138,7 +142,7 @@ public class DiscountCalculatorService {
                             .sum();
 
                     int eligibleDiscountRate = getDiscount(bookSet.size());
-                    return (eligibleDiscountRate / 100.0) * totalBookPrice;
+                    return (eligibleDiscountRate / TOTAL_PERCENT) * totalBookPrice;
                 })
                 .sum();
 
