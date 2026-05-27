@@ -61,7 +61,7 @@ public class DiscountCalculatorServiceTests {
 
     @Test()
     public void validateIfUnknownBoookIDPassedToProcessDiscount() {
-        CartBook cartBook1 = new CartBook(1006, "The Coder", 2,50);
+        CartBook cartBook1 = new CartBook(1006, "The Coder", 2);
         List<CartBook> books = new ArrayList<>();
         books.add(cartBook1);
         IllegalArgumentException exception = assertThrows(
@@ -75,7 +75,7 @@ public class DiscountCalculatorServiceTests {
 
     @Test
     public void checkForDiscountCalculationWhen1DistinctBookSelected() {
-        CartBook cartBook1 = new CartBook(1001, "Clean Code", 1,50);
+        CartBook cartBook1 = new CartBook(1001, "Clean Code", 1);
         List<CartBook> books = List.of(cartBook1);
         double discountAmt = this.discountCalculatorService.processDiscount(books);
         assertEquals(0, discountAmt);
@@ -83,8 +83,8 @@ public class DiscountCalculatorServiceTests {
 
     @Test
     public void checkForDiscountCalculationWhen2DistinctBookSelected() {
-        CartBook cartBook1 = new CartBook(1001, "Clean Code", 1,50);
-        CartBook cartBook2 = new CartBook(1002, "The Clean Coder", 1,50);
+        CartBook cartBook1 = new CartBook(1001, "Clean Code", 1);
+        CartBook cartBook2 = new CartBook(1002, "The Clean Coder", 1);
         List<CartBook> books = List.of(cartBook1, cartBook2);
 
         double discountAmt = this.discountCalculatorService.processDiscount(books);
@@ -94,9 +94,9 @@ public class DiscountCalculatorServiceTests {
     @Test
     public void checkForDiscountCalculationWhen3DistinctBookSelected() {
 
-        CartBook cartBook1 = new CartBook(1001, "Clean Code", 1,50);
-        CartBook cartBook2 = new CartBook(1002, "The Clean Coder", 1,50);
-        CartBook cartBook3 = new CartBook(1003, "Clean Architecture", 1,50);
+        CartBook cartBook1 = new CartBook(1001, "Clean Code", 1);
+        CartBook cartBook2 = new CartBook(1002, "The Clean Coder", 1);
+        CartBook cartBook3 = new CartBook(1003, "Clean Architecture", 1);
         List<CartBook> books = List.of(cartBook1, cartBook2, cartBook3);
 
         double discountAmt = this.discountCalculatorService.processDiscount(books);
@@ -106,10 +106,10 @@ public class DiscountCalculatorServiceTests {
     @Test
     public void checkForDiscountCalculationWhen4DistinctBookSelected() {
 
-        CartBook cartBook1 = new CartBook(1001, "Clean Code", 1,50);
-        CartBook cartBook2 = new CartBook(1002, "The Clean Coder", 1,50);
-        CartBook cartBook3 = new CartBook(1003, "Clean Architecture", 1,50);
-        CartBook cartBook4 = new CartBook(1004, "Test Driven Development by Example", 1,50);
+        CartBook cartBook1 = new CartBook(1001, "Clean Code", 1);
+        CartBook cartBook2 = new CartBook(1002, "The Clean Coder", 1);
+        CartBook cartBook3 = new CartBook(1003, "Clean Architecture", 1);
+        CartBook cartBook4 = new CartBook(1004, "Test Driven Development by Example", 1);
         List<CartBook> books = List.of(cartBook1, cartBook2, cartBook3, cartBook4);
 
         double discountAmt = this.discountCalculatorService.processDiscount(books);

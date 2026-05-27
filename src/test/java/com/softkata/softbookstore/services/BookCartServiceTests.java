@@ -19,9 +19,9 @@ public class BookCartServiceTests {
 
     @Test
     public void checkForDiscountProcessing() {
-        CartBook cartBook1 = new CartBook(1001, "Clean Code", 1,50);
-        CartBook cartBook2 = new CartBook(1002, "The Clean Coder", 1,50);
-        CartBook cartBook3 = new CartBook(1003, "Clean Architecture", 1,50);
+        CartBook cartBook1 = new CartBook(1001, "Clean Code", 1);
+        CartBook cartBook2 = new CartBook(1002, "The Clean Coder", 1);
+        CartBook cartBook3 = new CartBook(1003, "Clean Architecture", 1);
         List<CartBook> books = List.of(cartBook1, cartBook2, cartBook3);
         Cart bookCart = new Cart(books);
         double totalCartAmt = this.bookCartService.processCartAmount(bookCart);
