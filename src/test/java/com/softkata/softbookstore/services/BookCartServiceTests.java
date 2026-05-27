@@ -1,7 +1,9 @@
 package com.softkata.softbookstore.services;
 
+import com.softkata.softbookstore.BookTestDataProvider;
 import com.softkata.softbookstore.domain.Cart;
 import com.softkata.softbookstore.domain.CartBook;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,18 +15,41 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest
 public class BookCartServiceTests {
 
+    BookTestDataProvider bookTestDataProvider;
+
     @Autowired
     BookCartService bookCartService;
 
+    @BeforeEach
+    public void setupData() {
+        bookTestDataProvider = new BookTestDataProvider();
+    }
 
     @Test
     public void checkForDiscountProcessing() {
-        CartBook cartBook1 = new CartBook(1001, "Clean Code", 1);
-        CartBook cartBook2 = new CartBook(1002, "The Clean Coder", 1);
-        CartBook cartBook3 = new CartBook(1003, "Clean Architecture", 1);
-        List<CartBook> books = List.of(cartBook1, cartBook2, cartBook3);
+        List<CartBook> books = List.of(
+                bookTestDataProvider.addDummyCodeBook(1),
+                bookTestDataProvider.addDummyCoderBook(1),
+                bookTestDataProvider.addDummyCleanArchitectureBook(1)
+        );
         Cart bookCart = new Cart(books);
         double totalCartAmt = this.bookCartService.processCartAmount(bookCart);
         assertEquals(135, totalCartAmt);
+    }
+
+    @Test
+    public void processBookCartAmount() {
+
+        List<CartBook> books = List.of(
+                bookTestDataProvider.addDummyCodeBook(2),
+                bookTestDataProvider.addDummyCoderBook(2),
+                bookTestDataProvider.addDummyCleanArchitectureBook(2),
+                bookTestDataProvider.addDummyTDDByExampleBook(1),
+                bookTestDataProvider.addDummyWorkingWithLegacyBook(1)
+        );
+        Cart bookCart = new Cart(books);
+        double totalCartAmt = this.bookCartService.processCartAmount(bookCart);
+        assertEquals(320, totalCartAmt);
+
     }
 }

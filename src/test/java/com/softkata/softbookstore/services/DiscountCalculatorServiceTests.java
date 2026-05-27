@@ -1,6 +1,8 @@
 package com.softkata.softbookstore.services;
 
+import com.softkata.softbookstore.BookTestDataProvider;
 import com.softkata.softbookstore.domain.CartBook;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,6 +15,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 public class DiscountCalculatorServiceTests {
+
+    BookTestDataProvider bookTestDataProvider;
+
+    @BeforeEach
+    public void setupData() {
+        bookTestDataProvider = new BookTestDataProvider();
+    }
 
     @Autowired
     private DiscountCalculatorService discountCalculatorService;
@@ -75,30 +84,28 @@ public class DiscountCalculatorServiceTests {
 
     @Test
     public void checkForDiscountCalculationWhen1DistinctBookSelected() {
-        CartBook cartBook1 = new CartBook(1001, "Clean Code", 1);
-        List<CartBook> books = List.of(cartBook1);
+        List<CartBook> books = List.of(bookTestDataProvider.addDummyCodeBook(2));
         double discountAmt = this.discountCalculatorService.processDiscount(books);
         assertEquals(0, discountAmt);
     }
 
     @Test
     public void checkForDiscountCalculationWhen2DistinctBookSelected() {
-        CartBook cartBook1 = new CartBook(1001, "Clean Code", 1);
-        CartBook cartBook2 = new CartBook(1002, "The Clean Coder", 1);
-        List<CartBook> books = List.of(cartBook1, cartBook2);
-
+        List<CartBook> books = List.of(
+                bookTestDataProvider.addDummyCodeBook(1),
+                bookTestDataProvider.addDummyCoderBook(1)
+        );
         double discountAmt = this.discountCalculatorService.processDiscount(books);
         assertEquals(5, discountAmt);
     }
 
     @Test
     public void checkForDiscountCalculationWhen3DistinctBookSelected() {
-
-        CartBook cartBook1 = new CartBook(1001, "Clean Code", 1);
-        CartBook cartBook2 = new CartBook(1002, "The Clean Coder", 1);
-        CartBook cartBook3 = new CartBook(1003, "Clean Architecture", 1);
-        List<CartBook> books = List.of(cartBook1, cartBook2, cartBook3);
-
+        List<CartBook> books = List.of(
+                bookTestDataProvider.addDummyCodeBook(1),
+                bookTestDataProvider.addDummyCoderBook(1),
+                bookTestDataProvider.addDummyCleanArchitectureBook(1)
+        );
         double discountAmt = this.discountCalculatorService.processDiscount(books);
         assertEquals(15, discountAmt);
     }
@@ -106,15 +113,58 @@ public class DiscountCalculatorServiceTests {
     @Test
     public void checkForDiscountCalculationWhen4DistinctBookSelected() {
 
-        CartBook cartBook1 = new CartBook(1001, "Clean Code", 1);
-        CartBook cartBook2 = new CartBook(1002, "The Clean Coder", 1);
-        CartBook cartBook3 = new CartBook(1003, "Clean Architecture", 1);
-        CartBook cartBook4 = new CartBook(1004, "Test Driven Development by Example", 1);
-        List<CartBook> books = List.of(cartBook1, cartBook2, cartBook3, cartBook4);
-
+        List<CartBook> books = List.of(
+                bookTestDataProvider.addDummyCodeBook(1),
+                bookTestDataProvider.addDummyCoderBook(1),
+                bookTestDataProvider.addDummyCleanArchitectureBook(1),
+                bookTestDataProvider.addDummyTDDByExampleBook(1)
+        );
         double discountAmt = this.discountCalculatorService.processDiscount(books);
         assertEquals(40, discountAmt);
     }
+
+    @Test
+    public void checkForDiscountCalculationWhen5DistinctBookSelected() {
+
+        List<CartBook> books = List.of(
+                bookTestDataProvider.addDummyCodeBook(1),
+                bookTestDataProvider.addDummyCoderBook(1),
+                bookTestDataProvider.addDummyCleanArchitectureBook(1),
+                bookTestDataProvider.addDummyTDDByExampleBook(1),
+                bookTestDataProvider.addDummyWorkingWithLegacyBook(1)
+        );
+        double discountAmt = this.discountCalculatorService.processDiscount(books);
+        assertEquals(62.5, discountAmt);
+    }
+
+    @Test
+    public void checkForMixedBagDiscountCalculation() {
+
+        List<CartBook> books = List.of(
+                bookTestDataProvider.addDummyCodeBook(2),
+                bookTestDataProvider.addDummyCoderBook(2),
+                bookTestDataProvider.addDummyCleanArchitectureBook(2),
+                bookTestDataProvider.addDummyTDDByExampleBook(1),
+                bookTestDataProvider.addDummyWorkingWithLegacyBook(1)
+        );
+        double discountAmt = this.discountCalculatorService.processDiscount(books);
+        assertEquals(80, discountAmt);
+    }
+
+    @Test
+    public void checkForMixedBag2DiscountCalculation() {
+
+        List<CartBook> books = List.of(
+                bookTestDataProvider.addDummyCodeBook(2),
+                bookTestDataProvider.addDummyCoderBook(2),
+                bookTestDataProvider.addDummyCleanArchitectureBook(2),
+                bookTestDataProvider.addDummyTDDByExampleBook(2),
+                bookTestDataProvider.addDummyWorkingWithLegacyBook(2)
+        );
+        double discountAmt = this.discountCalculatorService.processDiscount(books);
+        assertEquals(125, discountAmt);
+    }
+
 
 
 }
