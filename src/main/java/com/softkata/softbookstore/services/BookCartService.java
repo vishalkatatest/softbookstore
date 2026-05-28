@@ -18,16 +18,14 @@ public class BookCartService {
     }
 
     public CartResponse processCartAmount(Cart bookCart) {
-        CartResponse cartResponse = new CartResponse();
         try {
             List<CartBook> books = bookCart.books();
             double discAmt = discountCalculatorService.processDiscount(books);
-            cartResponse.setDiscountAmount(discAmt);
-            cartResponse.setCartAmount(totalAmount(books) - discAmt);
+            return CartResponse.builder().discountAmount(discAmt).cartAmount(totalAmount(books) - discAmt).build();
+
         } catch (Exception e) {
-            cartResponse.setErrorMessage(e.getMessage());
+            return CartResponse.builder().errorMessage(e.getMessage()).build();
         }
-        return cartResponse;
     }
 
     private double totalAmount(List<CartBook> books) {
