@@ -90,14 +90,9 @@ public class DiscountCalculatorService {
             return Collections.emptyList();
         }
 
-        Set<Integer> currentBookSet = cartBooks.stream()
-                .filter(book -> copiesMap.getOrDefault(book.bookId(), 0) > 0)
-                .limit(groupSize)
-                .map(CartBook::bookId)
-                .collect(Collectors.toSet());
+        Set<Integer> currentBookSet = createCurrentBookSet(groupSize, copiesMap, cartBooks);
 
-        currentBookSet.forEach(bookId ->
-                copiesMap.computeIfPresent(bookId, (k, v) -> v - 1));
+        reduceBookCopies(currentBookSet, copiesMap);
 
         int consumed = currentBookSet.size();
 
@@ -109,11 +104,43 @@ public class DiscountCalculatorService {
                         cartBooks
                 );
 
+        return combineBookSets(currentBookSet, remainingBookSets);
+    }
+
+    private void reduceBookCopies(
+            Set<Integer> currentBookSet,
+            Map<Integer, Integer> copiesMap) {
+
+        currentBookSet.forEach(bookId ->
+                copiesMap.computeIfPresent(
+                        bookId,
+                        (k, v) -> v - 1
+                ));
+    }
+
+    private List<Set<Integer>> combineBookSets(
+            Set<Integer> currentBookSet,
+            List<Set<Integer>> remainingBookSets) {
+
         List<Set<Integer>> result = new ArrayList<>();
+
         result.add(currentBookSet);
         result.addAll(remainingBookSets);
 
         return result;
+    }
+
+    private Set<Integer> createCurrentBookSet(
+            int groupSize,
+            Map<Integer, Integer> copiesMap,
+            List<CartBook> cartBooks) {
+
+        return cartBooks.stream()
+                .filter(book ->
+                        copiesMap.getOrDefault(book.bookId(), 0) > 0)
+                .limit(groupSize)
+                .map(CartBook::bookId)
+                .collect(Collectors.toSet());
     }
 
     private double processMaxDiscount(List<Set<Integer>> bookDiscList) {
