@@ -2,6 +2,7 @@ package com.softkata.softbookstore.services;
 
 import com.softkata.softbookstore.domain.CartBook;
 import com.softkata.softbookstore.domain.DiscountData;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -12,18 +13,14 @@ import java.util.stream.IntStream;
 
 
 @Service
+@RequiredArgsConstructor
 public class DiscountCalculatorService {
 
     private static final int DECIMAL_ROUND_OFF = 2;
     private static final double TOTAL_PERCENT = 100.0;
 
-    DiscountRulesService discountRulesService;
-    BookStoreService bookStoreService;
-
-    public DiscountCalculatorService(DiscountRulesService discountRulesService, BookStoreService bookStoreService) {
-        this.discountRulesService = discountRulesService;
-        this.bookStoreService = bookStoreService;
-    }
+    private final DiscountRulesService discountRulesService;
+    private final BookStoreService bookStoreService;
 
     public int getDiscount(int totalBooks) {
 
@@ -46,15 +43,10 @@ public class DiscountCalculatorService {
         List<CartBook> cartBooks = consolidateCart(cartBookData);
         int distinctBookCnt = cartBooks.size();
 
-        //Get total number of books in the cart
         int totalBooksInCart = cartBooks.stream().mapToInt(CartBook::copies).sum();
 
-        //This map is created to have copy of book list and used to distribute each book copy under different sets
         Map<Integer, Integer> initialCopiesMap = getCartBookCopyMap(cartBooks);
 
-
-        //This will look for various possibilities to get best discount amount
-        //If only one distinct book present in the list then it will straight go to return statement with 0 discount
         double bestDiscount = IntStream
                 .rangeClosed(2, distinctBookCnt)
                 .mapToDouble(groupSize ->
@@ -72,7 +64,6 @@ public class DiscountCalculatorService {
                 .doubleValue();
 
     }
-
 
     private double calculateDiscountForGroupSize(
             int groupSize,
@@ -104,7 +95,6 @@ public class DiscountCalculatorService {
                 .map(CartBook::bookId)
                 .collect(Collectors.toSet());
 
-        //Reduce copies count by 1 after set is prepared
         currentBookSet.forEach(bookId ->
                 copiesMap.computeIfPresent(bookId, (k, v) -> v - 1));
 
@@ -137,10 +127,8 @@ public class DiscountCalculatorService {
 
     private double processMaxDiscount(List<Set<Integer>> bookDiscList) {
 
-        //get Book Master data map for Price calculation
         Map<Integer, Double> bookMasterDataMap = bookStoreService.getMasterBookPriceMapCopy();
 
-        //process set with standard discount rate
         return bookDiscList.stream()
                 .mapToDouble(bookSet -> {
                     double totalBookPrice = bookSet.stream()
@@ -152,19 +140,17 @@ public class DiscountCalculatorService {
                 })
                 .sum();
 
-        //return Math.max(calculatedTotalDiscount, maxDiscount);
-
     }
 
     private List<CartBook> consolidateCart(List<CartBook> cartBooks) {
         return cartBooks.stream()
                 .collect(Collectors.toMap(
                         CartBook::bookId,
-                        book -> book, // Keep the entire book object as the starting value
+                        book -> book,
                         (existing, replacement) -> new CartBook(
                                 existing.bookId(),
                                 existing.title(),
-                                existing.copies() + replacement.copies() // Sum the copies together
+                                existing.copies() + replacement.copies()
                         )
                 ))
                 .values().stream()
