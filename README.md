@@ -111,10 +111,26 @@ Now open Postman tool.
   ]
 }
 
+It will return client with below response format:
+{
+    "cartAmount": 230.0,
+    "discountAmount": 20.0
+}
+
 5) When you pass empty cart like below:
  {
   "books": []
 }
 
-It will show below response:
-errorMessage: No books are selected to process the cart
+It will return below response to client:
+{
+    "messageCode": "EMPTY_CART",
+    "errorMessage": "No books are selected to process the cart"
+}
+
+
+6) When Invalid book is passed, it will return client with below format response:
+{
+    "messageCode": "INVALID_BOOK",
+    "errorMessage": "Validation Failed: Book ID 1008 does not exist in the master catalog."
+}
