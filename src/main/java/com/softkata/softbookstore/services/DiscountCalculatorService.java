@@ -56,27 +56,13 @@ public class DiscountCalculatorService {
         //This will look for various possibilities to get best discount amount
         //If only one distinct book present in the list then it will straight go to return statement with 0 discount
         for (int distBookProb = distinctBookCnt; distBookProb >1; distBookProb--) {
-            int totBookCartCnt = totalBooksInCart;
+
             Map<Integer, Integer> bookCopiesMap = HashMap.newHashMap(initialCopiesMap.size());
             bookCopiesMap.putAll(initialCopiesMap);
-            List<Set<Integer>> bookDiscList = new ArrayList<>();
-            while (totBookCartCnt >0) {
-                Set<Integer> bookSet = HashSet.newHashSet(distBookProb);
-                for (CartBook book : cartBooks) {
-                    int bookId = book.bookId();
-                    int currentCount = bookCopiesMap.getOrDefault(bookId, 0);
-                    if (currentCount > 0) {
-                        bookSet.add(bookId);
-                        bookCopiesMap.put(bookId, currentCount - 1);
-                        totBookCartCnt--;
 
-                        if (bookSet.size() == distBookProb) {
-                            break;
-                        }
-                    }
-                }
-                bookDiscList.add(bookSet);
-            }
+            //Prepare Various Combination Group Set
+            List<Set<Integer>> bookDiscList =
+                    buildBookSets(distBookProb, totalBooksInCart, bookCopiesMap, cartBooks);
 
             //process set with standard discount rate
             maxDiscount = processMaxDiscount(bookDiscList, maxDiscount);
@@ -86,6 +72,44 @@ public class DiscountCalculatorService {
         return bd.doubleValue();
 
     }
+
+
+    private List<Set<Integer>> buildBookSets(
+            int groupSize,
+            int remainingBooks,
+            Map<Integer, Integer> copiesMap,
+            List<CartBook> cartBooks) {
+
+        if (remainingBooks <= 0) {
+            return Collections.emptyList();
+        }
+
+        Set<Integer> currentBookSet = cartBooks.stream()
+                .filter(book -> copiesMap.getOrDefault(book.bookId(), 0) > 0)
+                .limit(groupSize)
+                .map(CartBook::bookId)
+                .collect(Collectors.toSet());
+
+        currentBookSet.forEach(bookId ->
+                copiesMap.computeIfPresent(bookId, (k, v) -> v - 1));
+
+        int consumed = currentBookSet.size();
+
+        List<Set<Integer>> remainingBookSets =
+                buildBookSets(
+                        groupSize,
+                        remainingBooks - consumed,
+                        copiesMap,
+                        cartBooks
+                );
+
+        List<Set<Integer>> result = new ArrayList<>();
+        result.add(currentBookSet);
+        result.addAll(remainingBookSets);
+
+        return result;
+    }
+
 
     private Map<Integer, Integer> getCartBookCopyMap(List<CartBook> cartBooks) {
         return cartBooks.stream()
