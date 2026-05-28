@@ -43,17 +43,14 @@ public class DiscountCalculatorService {
     public double processDiscount(List<CartBook> cartBookData) {
 
         List<CartBook> cartBooks = consolidateCart(cartBookData);
-        int totalBooksInCart = 0;
         int distinctBookCnt = cartBooks.size();
         double maxDiscount = 0;
 
         //Get total number of books in the cart
-        for (CartBook book: cartBooks) {
-            totalBooksInCart += book.copies();
-        }
+        int totalBooksInCart = cartBooks.stream().mapToInt(CartBook::copies).sum();
 
         //This map is created to have copy of book list and used to distribute each book copy under different sets
-        Map<Integer, Integer> bookMainCopiesMap = getCartBookMapCopy(cartBooks);
+        Map<Integer, Integer> bookMainCopiesMap = getCartBookCopyMap(cartBooks);
 
 
         //This will look for various possibilities to get best discount amount
@@ -90,7 +87,7 @@ public class DiscountCalculatorService {
 
     }
 
-    private Map<Integer, Integer> getCartBookMapCopy(List<CartBook> cartBooks) {
+    private Map<Integer, Integer> getCartBookCopyMap(List<CartBook> cartBooks) {
         return cartBooks.stream()
                 .collect(Collectors.toMap(
                         CartBook::bookId,
