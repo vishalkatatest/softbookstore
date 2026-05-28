@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.softkata.softbookstore.constants.Constant.MIN_BOOKS_REQUIRED_IN_CART;
+
 @Service
 @RequiredArgsConstructor
 public class CartValidationService {
@@ -34,7 +36,7 @@ public class CartValidationService {
         }
 
         for (CartBook cartbook : cartBooks) {
-            if (cartbook.copies() <1) {
+            if (cartbook.copies() <MIN_BOOKS_REQUIRED_IN_CART) {
                 throw new IllegalArgumentException("Validation Failed: Number of copies cannot be less than 1 for book ID " + cartbook.bookId());
             }
         }

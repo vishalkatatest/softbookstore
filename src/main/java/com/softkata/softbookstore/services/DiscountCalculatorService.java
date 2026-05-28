@@ -12,13 +12,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static com.softkata.softbookstore.constants.Constant.*;
+
 
 @Service
 @RequiredArgsConstructor
 public class DiscountCalculatorService {
-
-    private static final int DECIMAL_ROUND_OFF = 2;
-    private static final double TOTAL_PERCENT = 100.0;
 
     private final DiscountRulesService discountRulesService;
     private final BookStoreService bookStoreService;
@@ -27,15 +26,15 @@ public class DiscountCalculatorService {
 
         List<DiscountData> discountRules = discountRulesService.getDiscountRules();
 
-        if (discountRules == null || discountRules.isEmpty() || totalBooks <= 0) {
-            return 0;
+        if (discountRules == null || discountRules.isEmpty() || totalBooks <= ZERO_INT) {
+            return ZERO_INT;
         }
 
         return discountRules.stream()
                 .filter(rule -> totalBooks == rule.noOfBooks())
                 .mapToInt(DiscountData::discPercent)
                 .findFirst()
-                .orElse(0);
+                .orElse(ZERO_INT);
 
     }
 
@@ -49,7 +48,7 @@ public class DiscountCalculatorService {
         Map<Integer, Integer> initialCopiesMap = CartUtils.buildCartBookCopyMap(cartBooks);
 
         double bestDiscount = IntStream
-                .rangeClosed(2, distinctBookCnt)
+                .rangeClosed(MIN_BOOKS_FOR_DISCOUNT, distinctBookCnt)
                 .mapToDouble(groupSize ->
                         calculateDiscountForGroupSize(
                                 groupSize,
@@ -58,7 +57,7 @@ public class DiscountCalculatorService {
                                 cartBooks
                         ))
                 .max()
-                .orElse(0);
+                .orElse(ZERO_INT);
 
         return BigDecimal.valueOf(bestDiscount)
                 .setScale(DECIMAL_ROUND_OFF, RoundingMode.HALF_UP)
@@ -86,7 +85,7 @@ public class DiscountCalculatorService {
             Map<Integer, Integer> copiesMap,
             List<CartBook> cartBooks) {
 
-        if (remainingBooks <= 0) {
+        if (remainingBooks <= ZERO_INT) {
             return Collections.emptyList();
         }
 
@@ -114,7 +113,7 @@ public class DiscountCalculatorService {
         currentBookSet.forEach(bookId ->
                 copiesMap.computeIfPresent(
                         bookId,
-                        (k, v) -> v - 1
+                        (k, v) -> v - DECREMENT_BY_ONE
                 ));
     }
 
@@ -137,7 +136,7 @@ public class DiscountCalculatorService {
 
         return cartBooks.stream()
                 .filter(book ->
-                        copiesMap.getOrDefault(book.bookId(), 0) > 0)
+                        copiesMap.getOrDefault(book.bookId(), ZERO_INT) > ZERO_INT)
                 .limit(groupSize)
                 .map(CartBook::bookId)
                 .collect(Collectors.toSet());
@@ -150,7 +149,7 @@ public class DiscountCalculatorService {
         return bookDiscList.stream()
                 .mapToDouble(bookSet -> {
                     double totalBookPrice = bookSet.stream()
-                            .mapToDouble(bookId -> bookMasterDataMap.getOrDefault(bookId, 0.0))
+                            .mapToDouble(bookId -> bookMasterDataMap.getOrDefault(bookId, ZERO_DOUBLE))
                             .sum();
 
                     int eligibleDiscountRate = getDiscount(bookSet.size());

@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.softkata.softbookstore.constants.Constant.ZERO_DOUBLE;
+
 @Service
 @RequiredArgsConstructor
 public class BookCartService {
@@ -29,7 +31,7 @@ public class BookCartService {
 
     private double totalAmount(List<CartBook> books) {
         return books.stream().mapToDouble(book -> {
-            double unitPrice = bookStoreService.getMasterBookPriceMapCopy().getOrDefault(book.bookId(), 0.0);
+            double unitPrice = bookStoreService.getMasterBookPriceMapCopy().getOrDefault(book.bookId(), ZERO_DOUBLE);
             return book.copies() * unitPrice;
         }).sum();
     }
