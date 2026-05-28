@@ -2,6 +2,7 @@ package com.softkata.softbookstore.services;
 
 import com.softkata.softbookstore.domain.CartBook;
 import com.softkata.softbookstore.domain.DiscountData;
+import com.softkata.softbookstore.utils.CartUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -40,12 +41,12 @@ public class DiscountCalculatorService {
 
     public double processDiscount(List<CartBook> cartBookData) {
 
-        List<CartBook> cartBooks = consolidateCart(cartBookData);
+        List<CartBook> cartBooks = CartUtils.consolidateCart(cartBookData);
         int distinctBookCnt = cartBooks.size();
 
         int totalBooksInCart = cartBooks.stream().mapToInt(CartBook::copies).sum();
 
-        Map<Integer, Integer> initialCopiesMap = getCartBookCopyMap(cartBooks);
+        Map<Integer, Integer> initialCopiesMap = CartUtils.buildCartBookCopyMap(cartBooks);
 
         double bestDiscount = IntStream
                 .rangeClosed(2, distinctBookCnt)
@@ -115,16 +116,6 @@ public class DiscountCalculatorService {
         return result;
     }
 
-
-    private Map<Integer, Integer> getCartBookCopyMap(List<CartBook> cartBooks) {
-        return cartBooks.stream()
-                .collect(Collectors.toMap(
-                        CartBook::bookId,
-                        CartBook::copies
-                ));
-    }
-
-
     private double processMaxDiscount(List<Set<Integer>> bookDiscList) {
 
         Map<Integer, Double> bookMasterDataMap = bookStoreService.getMasterBookPriceMapCopy();
@@ -142,19 +133,6 @@ public class DiscountCalculatorService {
 
     }
 
-    private List<CartBook> consolidateCart(List<CartBook> cartBooks) {
-        return cartBooks.stream()
-                .collect(Collectors.toMap(
-                        CartBook::bookId,
-                        book -> book,
-                        (existing, replacement) -> new CartBook(
-                                existing.bookId(),
-                                existing.title(),
-                                existing.copies() + replacement.copies()
-                        )
-                ))
-                .values().stream()
-                .toList();
-    }
+
 
 }
