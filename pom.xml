@@ -62,7 +62,6 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.12</version>
-
                 <executions>
 
                     <!-- Attach JaCoCo agent -->
@@ -79,6 +78,11 @@
                         <goals>
                             <goal>report</goal>
                         </goals>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/Constant.class</exclude>
+                            </excludes>
+                        </configuration>
                     </execution>
 
                 </executions>
