@@ -8,5 +8,4 @@ import lombok.Data;
 public class CartResponse {
     double cartAmount;
     double discountAmount;
-    String errorMessage;
 }

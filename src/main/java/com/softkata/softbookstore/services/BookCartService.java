@@ -18,15 +18,10 @@ public class BookCartService {
     private final CartValidationService cartValidationService;
 
     public CartResponse processCartAmount(Cart bookCart) {
-        try {
             List<CartBook> books = bookCart.books();
             cartValidationService.validateBeforeProcessingCart(books);
             double discAmt = discountCalculatorService.processDiscount(books);
             return CartResponse.builder().discountAmount(discAmt).cartAmount(totalAmount(books) - discAmt).build();
-
-        } catch (Exception e) {
-            return CartResponse.builder().errorMessage(e.getMessage()).build();
-        }
     }
 
     private double totalAmount(List<CartBook> books) {

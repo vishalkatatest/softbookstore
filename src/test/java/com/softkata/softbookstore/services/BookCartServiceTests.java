@@ -4,6 +4,8 @@ import com.softkata.softbookstore.BookTestDataProvider;
 import com.softkata.softbookstore.domain.Cart;
 import com.softkata.softbookstore.domain.CartBook;
 import com.softkata.softbookstore.domain.CartResponse;
+import com.softkata.softbookstore.exception.InvalidBookException;
+import com.softkata.softbookstore.exception.NegativeCopiesException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 public class BookCartServiceTests {
@@ -60,8 +63,12 @@ public class BookCartServiceTests {
     public void validateIfNoBooksAreSelectedToServiceProcessCart() {
         List<CartBook> books = new ArrayList<>();
         Cart bookCart = new Cart(books);
-        CartResponse cartResponse = this.bookCartService.processCartAmount(bookCart);
-        assertEquals("No books are selected to process the cart", cartResponse.getErrorMessage());
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> this.bookCartService.processCartAmount(bookCart),
+                "Should throw IllegalArgumentException for empty book list"
+        );
+        assertEquals("No books are selected to process the cart", exception.getMessage());
 
     }
 
@@ -69,8 +76,12 @@ public class BookCartServiceTests {
     public void validateIfBookCopiesPassedWithNullList() {
         List<CartBook> books = null;
         Cart bookCart = new Cart(books);
-        CartResponse cartResponse = this.bookCartService.processCartAmount(bookCart);
-        assertEquals("No books are selected to process the cart", cartResponse.getErrorMessage());
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> this.bookCartService.processCartAmount(bookCart),
+                "Should throw IllegalArgumentException for empty book list"
+        );
+        assertEquals("No books are selected to process the cart", exception.getMessage());
 
     }
 
@@ -81,8 +92,12 @@ public class BookCartServiceTests {
         List<CartBook> books = new ArrayList<>();
         books.add(cartBook1);
         Cart bookCart = new Cart(books);
-        CartResponse cartResponse = this.bookCartService.processCartAmount(bookCart);
-        assertEquals("Validation Failed: Book ID " + cartBook1.bookId() + " does not exist in the master catalog.", cartResponse.getErrorMessage());
+        InvalidBookException exception = assertThrows(
+                InvalidBookException.class,
+                () -> this.bookCartService.processCartAmount(bookCart),
+                "Should throw InvalidBookException for Unknown Book ID"
+        );
+        assertEquals("Validation Failed: Book ID " + books.getFirst().bookId() + " does not exist in the master catalog.", exception.getMessage());
 
     }
 
@@ -91,8 +106,13 @@ public class BookCartServiceTests {
     public void validateIfBookCopiesPassedWithNegativeNumber() {
         List<CartBook> books = List.of(bookTestDataProvider.addDummyCodeBook(-2));
         Cart bookCart = new Cart(books);
-        CartResponse cartResponse = this.bookCartService.processCartAmount(bookCart);
-        assertEquals("Validation Failed: Number of copies cannot be less than 1 for book ID " + books.getFirst().bookId(), cartResponse.getErrorMessage());
+
+        NegativeCopiesException exception = assertThrows(
+                NegativeCopiesException.class,
+                () -> bookCartService.processCartAmount(bookCart),
+                "Should throw NegativeCopiesException for Negative copies"
+        );
+        assertEquals("Validation Failed: Number of copies cannot be less than 1 for book ID " + books.getFirst().bookId(), exception.getMessage());
 
     }
 }
