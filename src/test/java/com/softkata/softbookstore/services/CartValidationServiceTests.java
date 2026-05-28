@@ -2,6 +2,8 @@ package com.softkata.softbookstore.services;
 
 import com.softkata.softbookstore.BookTestDataProvider;
 import com.softkata.softbookstore.domain.CartBook;
+import com.softkata.softbookstore.exception.InvalidBookException;
+import com.softkata.softbookstore.exception.NegativeCopiesException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,10 +45,10 @@ public class CartValidationServiceTests {
         CartBook cartBook1 = new CartBook(1006, "The Coder", 2);
         List<CartBook> books = new ArrayList<>();
         books.add(cartBook1);
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        InvalidBookException exception = assertThrows(
+                InvalidBookException.class,
                 () -> this.cartValidationService.validateBeforeProcessingCart(books),
-                "Should throw IllegalArgumentException for Unknown Book ID"
+                "Should throw InvalidBookException for Unknown Book ID"
         );
         assertEquals("Validation Failed: Book ID " + cartBook1.bookId() + " does not exist in the master catalog.", exception.getMessage());
 
@@ -56,10 +58,10 @@ public class CartValidationServiceTests {
     @Test()
     public void validateIfBookCopiesPassedWithNegativeNumber() {
         List<CartBook> books = List.of(bookTestDataProvider.addDummyCodeBook(-2));
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        NegativeCopiesException exception = assertThrows(
+                NegativeCopiesException.class,
                 () -> cartValidationService.validateBeforeProcessingCart(books),
-                "Should throw IllegalArgumentException for Negative copies"
+                "Should throw NegativeCopiesException for Negative copies"
         );
         assertEquals("Validation Failed: Number of copies cannot be less than 1 for book ID " + books.getFirst().bookId(), exception.getMessage());
 

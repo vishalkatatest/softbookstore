@@ -2,6 +2,8 @@ package com.softkata.softbookstore.services;
 
 import com.softkata.softbookstore.domain.Book;
 import com.softkata.softbookstore.domain.CartBook;
+import com.softkata.softbookstore.exception.InvalidBookException;
+import com.softkata.softbookstore.exception.NegativeCopiesException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -41,7 +43,7 @@ public class CartValidationService {
             Set<Integer> validBookIds) {
 
         if (!validBookIds.contains(cartBook.bookId())) {
-            throw new IllegalArgumentException(
+            throw new InvalidBookException(
                     "Validation Failed: Book ID "
                             + cartBook.bookId()
                             + " does not exist in the master catalog."
@@ -52,7 +54,7 @@ public class CartValidationService {
     private void validateBookCopies(CartBook cartBook) {
 
         if (cartBook.copies() < MIN_BOOKS_REQUIRED_IN_CART) {
-            throw new IllegalArgumentException(
+            throw new NegativeCopiesException(
                     "Validation Failed: Number of copies cannot be less than 1 for book ID "
                             + cartBook.bookId()
             );
