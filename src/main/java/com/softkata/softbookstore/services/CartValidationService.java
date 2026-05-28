@@ -29,16 +29,33 @@ public class CartValidationService {
                 .map(Book::bookId)
                 .collect(Collectors.toSet());
 
-        for (CartBook cartbook : cartBooks) {
-            if (!validBookIds.contains(cartbook.bookId())) {
-                throw new IllegalArgumentException("Validation Failed: Book ID " + cartbook.bookId() + " does not exist in the master catalog.");
-            }
+        for (CartBook cartBook : cartBooks) {
+            validateBookExists(cartBook, validBookIds);
+            validateBookCopies(cartBook);
         }
+    }
 
-        for (CartBook cartbook : cartBooks) {
-            if (cartbook.copies() <MIN_BOOKS_REQUIRED_IN_CART) {
-                throw new IllegalArgumentException("Validation Failed: Number of copies cannot be less than 1 for book ID " + cartbook.bookId());
-            }
+
+    private void validateBookExists(
+            CartBook cartBook,
+            Set<Integer> validBookIds) {
+
+        if (!validBookIds.contains(cartBook.bookId())) {
+            throw new IllegalArgumentException(
+                    "Validation Failed: Book ID "
+                            + cartBook.bookId()
+                            + " does not exist in the master catalog."
+            );
+        }
+    }
+
+    private void validateBookCopies(CartBook cartBook) {
+
+        if (cartBook.copies() < MIN_BOOKS_REQUIRED_IN_CART) {
+            throw new IllegalArgumentException(
+                    "Validation Failed: Number of copies cannot be less than 1 for book ID "
+                            + cartBook.bookId()
+            );
         }
     }
 }
