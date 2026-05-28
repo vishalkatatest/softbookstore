@@ -50,15 +50,15 @@ public class DiscountCalculatorService {
         int totalBooksInCart = cartBooks.stream().mapToInt(CartBook::copies).sum();
 
         //This map is created to have copy of book list and used to distribute each book copy under different sets
-        Map<Integer, Integer> bookMainCopiesMap = getCartBookCopyMap(cartBooks);
+        Map<Integer, Integer> initialCopiesMap = getCartBookCopyMap(cartBooks);
 
 
         //This will look for various possibilities to get best discount amount
         //If only one distinct book present in the list then it will straight go to return statement with 0 discount
         for (int distBookProb = distinctBookCnt; distBookProb >1; distBookProb--) {
             int totBookCartCnt = totalBooksInCart;
-            Map<Integer, Integer> bookCopiesMap = HashMap.newHashMap(bookMainCopiesMap.size());
-            bookCopiesMap.putAll(bookMainCopiesMap);
+            Map<Integer, Integer> bookCopiesMap = HashMap.newHashMap(initialCopiesMap.size());
+            bookCopiesMap.putAll(initialCopiesMap);
             List<Set<Integer>> bookDiscList = new ArrayList<>();
             while (totBookCartCnt >0) {
                 Set<Integer> bookSet = HashSet.newHashSet(distBookProb);
