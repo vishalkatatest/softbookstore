@@ -1,6 +1,5 @@
 package com.softkata.softbookstore.services;
 
-import com.softkata.softbookstore.domain.Book;
 import com.softkata.softbookstore.domain.CartBook;
 import com.softkata.softbookstore.domain.DiscountData;
 import org.springframework.stereotype.Service;
@@ -16,7 +15,6 @@ public class DiscountCalculatorService {
 
     private static final int DECIMAL_ROUND_OFF = 2;
     private static final double TOTAL_PERCENT = 100.0;
-    private static final String EMPTY_CART_MESSAGE = "No books are selected to process the cart";
 
     DiscountRulesService discountRulesService;
     BookStoreService bookStoreService;
@@ -44,7 +42,6 @@ public class DiscountCalculatorService {
 
     public double processDiscount(List<CartBook> cartBookData) {
 
-        validateBeforeProcessingDiscount(cartBookData);
         List<CartBook> cartBooks = consolidateCart(cartBookData);
         int totalBooksInCart = 0;
         int distinctBookCnt = cartBooks.size();
@@ -91,33 +88,6 @@ public class DiscountCalculatorService {
         bd = bd.setScale(DECIMAL_ROUND_OFF, RoundingMode.HALF_UP);
         return bd.doubleValue();
 
-    }
-
-    private void validateBeforeProcessingDiscount(List<CartBook> cartBooks) {
-
-        //Check if list of books are not empty
-        if(cartBooks == null || cartBooks.isEmpty()) {
-            throw new IllegalArgumentException(EMPTY_CART_MESSAGE);
-        }
-
-        //Retrieve all valid book IDs from master data
-        Set<Integer> validBookIds = this.bookStoreService.getBookMasterData().stream()
-                .map(Book::bookId)
-                .collect(Collectors.toSet());
-
-        // Check for any unknown IDs
-        for (CartBook cartbook : cartBooks) {
-            if (!validBookIds.contains(cartbook.bookId())) {
-                throw new IllegalArgumentException("Validation Failed: Book ID " + cartbook.bookId() + " does not exist in the master catalog.");
-            }
-        }
-
-        // Check for any book copy with negative numbers
-        for (CartBook cartbook : cartBooks) {
-            if (cartbook.copies() <1) {
-                throw new IllegalArgumentException("Validation Failed: Number of copies cannot be less than 1 for book ID " + cartbook.bookId());
-            }
-        }
     }
 
     private Map<Integer, Integer> getCartBookMapCopy(List<CartBook> cartBooks) {

@@ -57,11 +57,42 @@ public class BookCartServiceTests {
     }
 
     @Test()
-    public void validateIfNoBooksAreSelectedToServiceProcessDiscount() {
+    public void validateIfNoBooksAreSelectedToServiceProcessCart() {
         List<CartBook> books = new ArrayList<>();
         Cart bookCart = new Cart(books);
         CartResponse cartResponse = this.bookCartService.processCartAmount(bookCart);
         assertEquals("No books are selected to process the cart", cartResponse.getErrorMessage());
+
+    }
+
+    @Test()
+    public void validateIfBookCopiesPassedWithNullList() {
+        List<CartBook> books = null;
+        Cart bookCart = new Cart(books);
+        CartResponse cartResponse = this.bookCartService.processCartAmount(bookCart);
+        assertEquals("No books are selected to process the cart", cartResponse.getErrorMessage());
+
+    }
+
+
+    @Test()
+    public void validateIfUnknownBoookIDPassedToProcessCart() {
+        CartBook cartBook1 = new CartBook(1006, "The Coder", 2);
+        List<CartBook> books = new ArrayList<>();
+        books.add(cartBook1);
+        Cart bookCart = new Cart(books);
+        CartResponse cartResponse = this.bookCartService.processCartAmount(bookCart);
+        assertEquals("Validation Failed: Book ID " + cartBook1.bookId() + " does not exist in the master catalog.", cartResponse.getErrorMessage());
+
+    }
+
+
+    @Test()
+    public void validateIfBookCopiesPassedWithNegativeNumber() {
+        List<CartBook> books = List.of(bookTestDataProvider.addDummyCodeBook(-2));
+        Cart bookCart = new Cart(books);
+        CartResponse cartResponse = this.bookCartService.processCartAmount(bookCart);
+        assertEquals("Validation Failed: Number of copies cannot be less than 1 for book ID " + books.getFirst().bookId(), cartResponse.getErrorMessage());
 
     }
 }
